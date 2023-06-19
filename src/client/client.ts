@@ -26,8 +26,11 @@ const icosahedronGeometry = new THREE.IcosahedronGeometry(1, 0);
 const planeGeometry = new THREE.PlaneGeometry();
 const torusKnotGeometry = new THREE.TorusKnotGeometry();
 
-const material = new THREE.MeshBasicMaterial();
-//const material= new THREE.MeshNormalMaterial()
+const material = new THREE.MeshBasicMaterial({
+  color: 0x00ff00,
+  wireframe: true,
+});
+// const material = new THREE.MeshNormalMaterial();
 
 const cube = new THREE.Mesh(boxGeometry, material);
 cube.position.x = 5;
@@ -78,11 +81,11 @@ materialFolder.add(material, 'depthTest');
 materialFolder.add(material, 'depthWrite');
 materialFolder
   .add(material, 'alphaTest', 0, 1, 0.01)
-  .onChange(() => updateMaterial());
+  .onChange(() => updateMaterial()); // opacity 보다 작아지면 보이지않음
 materialFolder.add(material, 'visible');
 materialFolder
   .add(material, 'side', options.side)
-  .onChange(() => updateMaterial());
+  .onChange(() => updateMaterial()); // 카메라 정면에서 보이는 side 결정
 materialFolder.open();
 
 function updateMaterial() {
