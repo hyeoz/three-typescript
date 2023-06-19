@@ -26,25 +26,11 @@ const icosahedronGeometry = new THREE.IcosahedronGeometry(1, 0);
 const planeGeometry = new THREE.PlaneGeometry();
 const torusKnotGeometry = new THREE.TorusKnotGeometry();
 
-const material = new THREE.MeshBasicMaterial({
-  // color: 0x00ff00,
-  // wireframe: true,
-});
-// const material = new THREE.MeshNormalMaterial();
-
-const texture = new THREE.TextureLoader().load('img/grid.png');
-material.map = texture;
-const envTexture = new THREE.CubeTextureLoader().load([
-  'img/px_50.png',
-  'img/nx_50.png',
-  'img/py_50.png',
-  'img/ny_50.png',
-  'img/pz_50.png',
-  'img/nz_50.png',
-]); // scene 을 둘러싸고 있는 env texture 는 cube texture 로 생성해줌
-envTexture.mapping = THREE.CubeReflectionMapping;
-// envTexture.mapping = THREE.CubeRefractionMapping;
-material.envMap = envTexture;
+// const material = new THREE.MeshBasicMaterial({
+//   // color: 0x00ff00,
+//   // wireframe: true,
+// });
+const material = new THREE.MeshNormalMaterial(); // light 등을 설정하지 않아도 mesh 의 각 면의 곡률에 따라 빛의 반사에 따라 texture 를 보여줌
 
 const cube = new THREE.Mesh(boxGeometry, material);
 cube.position.x = 5;
@@ -106,25 +92,8 @@ materialFolder
   .onChange(() => updateMaterial()); // 카메라 정면에서 보이는 side 결정
 materialFolder.open();
 
-const data = {
-  color: material.color.getHex(),
-};
-
-const meshBasicMaterialFolder = gui.addFolder('THREE.MeshBasicMaterial');
-meshBasicMaterialFolder.addColor(data, 'color').onChange(() => {
-  material.color.setHex(Number(data.color.toString().replace('#', '0x')));
-});
-meshBasicMaterialFolder.add(material, 'wireframe');
-meshBasicMaterialFolder.add(material, 'wireframeLinewidth', 0, 10);
-meshBasicMaterialFolder.add(material, 'reflectivity', 0, 1); // envTexture 가 mesh 에 비쳐지는 정도
-meshBasicMaterialFolder.add(material, 'refractionRatio', 0, 1); // envTexture 가 비쳐지는 굴절율
-meshBasicMaterialFolder
-  .add(material, 'combine', options.combine)
-  .onChange(() => updateMaterial());
-
 function updateMaterial() {
   material.side = Number(material.side) as THREE.Side; // side
-  material.combine = Number(material.combine) as THREE.Combine; //combine
   material.needsUpdate = true; // transparent, alphaTest
 }
 
