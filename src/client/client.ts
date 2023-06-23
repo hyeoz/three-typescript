@@ -35,10 +35,11 @@ const torusKnotGeometry = new THREE.TorusKnotGeometry();
 //   // wireframe: true,
 // });
 // const material = new THREE.MeshNormalMaterial(); // light 등을 설정하지 않아도 mesh 의 각 면의 곡률에 따라 빛의 반사에 따라 texture 를 보여줌
-const material = new THREE.MeshLambertMaterial(); // light 에 반응하는 material
+// const material = new THREE.MeshLambertMaterial(); // light 에 반응하는 material
+const material = new THREE.MeshPhongMaterial(); // light 에 반응하는 material, 반사 하이라이트가 있는 광택 재질
 
-const texture = new THREE.TextureLoader().load('img/grid.png');
-material.map = texture;
+// const texture = new THREE.TextureLoader().load('img/grid.png');
+// material.map = texture;
 
 const cube = new THREE.Mesh(boxGeometry, material);
 cube.position.x = 5;
@@ -78,16 +79,16 @@ const options = {
     DoubleSide: THREE.DoubleSide,
   },
   combine: {
-    // material 과 envTexture 가 합쳐지는 옵션
     MultiplyOperation: THREE.MultiplyOperation,
     MixOperation: THREE.MixOperation,
     AddOperation: THREE.AddOperation,
-  },
+  }, // material 과 envTexture 가 합쳐지는 옵션
 };
 
 const data = {
   color: material.color.getHex(),
   emissive: material.emissive.getHex(),
+  specular: material.specular.getHex(),
 };
 
 const gui = new GUI();
@@ -105,28 +106,53 @@ materialFolder
   .onChange(() => updateMaterial()); // 카메라 정면에서 보이는 side 결정
 materialFolder.open();
 
-const meshLambertMaterialFolder = gui.addFolder('THREE.MeshLambertMaterial');
+// const meshLambertMaterialFolder = gui.addFolder('THREE.MeshLambertMaterial');
 
-meshLambertMaterialFolder.addColor(data, 'color').onChange(() => {
+// meshLambertMaterialFolder.addColor(data, 'color').onChange(() => {
+//   material.color.setHex(Number(data.color.toString().replace('#', '0x')));
+// });
+// meshLambertMaterialFolder.addColor(data, 'emissive').onChange(() => {
+//   material.emissive.setHex(Number(data.emissive.toString().replace('#', '0x')));
+// }); // 실제 light 와는 상관없지만 light 가 비추는 것 처럼 표현
+// meshLambertMaterialFolder.add(material, 'wireframe');
+// meshLambertMaterialFolder.add(material, 'wireframeLinewidth', 0, 10);
+// meshLambertMaterialFolder
+//   .add(material, 'flatShading')
+//   .onChange(() => updateMaterial());
+// meshLambertMaterialFolder
+//   .add(material, 'combine', options.combine)
+//   .onChange(() => updateMaterial());
+// meshLambertMaterialFolder.add(material, 'reflectivity', 0, 1);
+// meshLambertMaterialFolder.add(material, 'refractionRatio', 0, 1);
+// meshLambertMaterialFolder.open();
+
+const meshPhongMaterialFolder = gui.addFolder('THREE.MeshPhongMaterial');
+
+meshPhongMaterialFolder.addColor(data, 'color').onChange(() => {
   material.color.setHex(Number(data.color.toString().replace('#', '0x')));
 });
-meshLambertMaterialFolder.addColor(data, 'emissive').onChange(() => {
+meshPhongMaterialFolder.addColor(data, 'emissive').onChange(() => {
   material.emissive.setHex(Number(data.emissive.toString().replace('#', '0x')));
 });
-meshLambertMaterialFolder.add(material, 'wireframe');
-meshLambertMaterialFolder.add(material, 'wireframeLinewidth', 0, 10);
-meshLambertMaterialFolder
+meshPhongMaterialFolder.addColor(data, 'specular').onChange(() => {
+  material.specular.setHex(Number(data.specular.toString().replace('#', '0x')));
+});
+meshPhongMaterialFolder.add(material, 'shininess', 0, 1024);
+meshPhongMaterialFolder.add(material, 'wireframe');
+meshPhongMaterialFolder.add(material, 'wireframeLinewidth', 0, 10);
+meshPhongMaterialFolder
   .add(material, 'flatShading')
   .onChange(() => updateMaterial());
-meshLambertMaterialFolder
+meshPhongMaterialFolder
   .add(material, 'combine', options.combine)
   .onChange(() => updateMaterial());
-meshLambertMaterialFolder.add(material, 'reflectivity', 0, 1);
-meshLambertMaterialFolder.add(material, 'refractionRatio', 0, 1);
-meshLambertMaterialFolder.open();
+meshPhongMaterialFolder.add(material, 'reflectivity', 0, 1);
+meshPhongMaterialFolder.add(material, 'refractionRatio', 0, 1);
+meshPhongMaterialFolder.open();
 
 function updateMaterial() {
   material.side = Number(material.side) as THREE.Side; // side
+  material.combine = Number(material.combine) as THREE.Combine;
   material.needsUpdate = true; // transparent, alphaTest
 }
 
